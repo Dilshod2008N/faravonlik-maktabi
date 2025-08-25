@@ -2,67 +2,40 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Faravonlik maktabi</title>
   <style>
-    body {
-      background-color: skyblue; /* osmon rang fon */
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
+    body { 
+      background-color: skyblue; 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
     }
-    h1 {
-      color: darkblue;
-    }
-    .login-box {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      width: 300px;
-      margin: 30px auto;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
-    }
-    input {
-      padding: 10px;
-      margin: 5px;
-      width: 90%;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      padding: 10px 20px;
-      background: darkblue;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: navy;
-    }
+    h1 { color: darkblue; }
+    table { margin: auto; border-collapse: collapse; width: 60%; background: white; }
+    th, td { border: 1px solid black; padding: 8px; }
+    th { background-color: lightgray; }
   </style>
 </head>
 <body>
   <h1>Faravonlik maktabi</h1>
-  <div class="login-box">
-    <h3>Admin panelga kirish</h3>
-    <input type="text" id="login" placeholder="Login">
-    <input type="password" id="parol" placeholder="Parol">
-    <button onclick="kirish()">Kirish</button>
-    <p id="xabar" style="color:red;"></p>
-  </div>
+  <h2>O'quvchilar ro'yxati</h2>
+  <table id="studentsTable">
+    <tr><th>Ism</th><th>Holat</th></tr>
+  </table>
+
+  <p><a href="login.html">🔑 Admin kirish</a></p>
 
   <script>
-    function kirish() {
-      let login = document.getElementById("login").value;
-      let parol = document.getElementById("parol").value;
-
-      if (login === "Faravon_maktab" && parol === "maktab123F") {
-        window.location.href = "admin.html"; // Admin panelga o‘tadi
-      } else {
-        document.getElementById("xabar").innerText = "Login yoki parol noto‘g‘ri!";
-      }
+    // LocalStorage’dan ro‘yxatni chiqarish
+    function loadStudents() {
+      let students = JSON.parse(localStorage.getItem("students") || "[]");
+      let table = document.getElementById("studentsTable");
+      table.innerHTML = "<tr><th>Ism</th><th>Holat</th></tr>";
+      students.forEach(s => {
+        let row = `<tr><td>${s.name}</td><td>${s.status}</td></tr>`;
+        table.innerHTML += row;
+      });
     }
+    loadStudents();
   </script>
 </body>
 </html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin panel - Faravonlik maktabi</title>
+  <style>
+    body {
+      background-color: skyblue;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: darkblue;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 350px;
+      margin: 20px auto;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+    }
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: darkblue;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: navy;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 90%;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    th {
+      background: lightgray;
+    }
+  </style>
+</head>
+<body>
+  <h1>Faravonlik maktabi — Admin panel</h1>
+
+  <div class="box">
+    <h3>O‘quvchi qo‘shish</h3>
+    <input type="text" id="ism" placeholder="O‘quvchi ismi">
+    <button onclick="qoshish()">Qo‘shish</button>
+  </div>
+
+  <h2>O‘quvchilar ro‘yxati</h2>
+  <table id="jadval">
+    <tr>
+      <th>Ism</th>
+      <th>Keldi</th>
+      <th>Kelmadi</th>
+    </tr>
+  </table>
+
+  <script>
+    function qoshish() {
+      let ism = document.getElementById("ism").value;
+      if (ism.trim() === "") {
+        alert("Ism yozing!");
+        return;
+      }
+
+      let jadval = document.getElementById("jadval");
+      let qator = jadval.insertRow(-1);
+
+      let katak1 = qator.insertCell(0);
+      let katak2 = qator.insertCell(1);
+      let katak3 = qator.insertCell(2);
+
+      katak1.innerText = ism;
+      katak2.innerHTML = "<input type='radio' name='"+ism+"' value='Keldi'>";
+      katak3.innerHTML = "<input type='radio' name='"+ism+"' value='Kelmadi'>";
+
+      document.getElementById("ism").value = "";
+    }
+  </script>
+</body>
+</html>

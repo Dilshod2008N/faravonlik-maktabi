@@ -4,38 +4,183 @@
   <meta charset="UTF-8">
   <title>Faravonlik maktabi</title>
   <style>
-    body { 
-      background-color: skyblue; 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #87CEEB; /* osmon rang */
     }
-    h1 { color: darkblue; }
-    table { margin: auto; border-collapse: collapse; width: 60%; background: white; }
-    th, td { border: 1px solid black; padding: 8px; }
-    th { background-color: lightgray; }
+    header {
+      background: #004080;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu-btn {
+      font-size: 26px;
+      cursor: pointer;
+    }
+    .menu {
+      display: none;
+      position: absolute;
+      right: 10px;
+      top: 50px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .menu a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: black;
+    }
+    .menu a:hover {
+      background: #eee;
+    }
+    .container {
+      padding: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #004080;
+      color: white;
+    }
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+    }
+    .yes { background: #28a745; color: white; }
+    .no { background: #dc3545; color: white; }
+    .login-box {
+      max-width: 300px;
+      margin: 50px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
-  <h1>Faravonlik maktabi</h1>
-  <h2>O'quvchilar ro'yxati</h2>
-  <table id="studentsTable">
-    <tr><th>Ism</th><th>Holat</th></tr>
-  </table>
 
-  <p><a href="login.html">🔑 Admin kirish</a></p>
+<header>
+  <h2>Faravonlik maktabi</h2>
+  <div class="menu-btn">☰</div>
+  <div class="menu" id="menu">
+    <a href="#" onclick="showSection('main')">Asosiy sahifa</a>
+    <a href="#" onclick="showSection('login')">Admin panelga kirish</a>
+  </div>
+</header>
 
-  <script>
-    // LocalStorage’dan ro‘yxatni chiqarish
-    function loadStudents() {
-      let students = JSON.parse(localStorage.getItem("students") || "[]");
-      let table = document.getElementById("studentsTable");
-      table.innerHTML = "<tr><th>Ism</th><th>Holat</th></tr>";
-      students.forEach(s => {
-        let row = `<tr><td>${s.name}</td><td>${s.status}</td></tr>`;
-        table.innerHTML += row;
-      });
+<div class="container">
+  <!-- Asosiy sahifa -->
+  <div id="main">
+    <h3>O‘quvchilar ro‘yxati</h3>
+    <table id="studentsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ismi</th>
+          <th>Holati</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Ali</td><td id="status1">—</td></tr>
+        <tr><td>2</td><td>Vali</td><td id="status2">—</td></tr>
+        <tr><td>3</td><td>Guli</td><td id="status3">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Login sahifasi -->
+  <div id="login" class="hidden">
+    <div class="login-box">
+      <h3>Admin kirishi</h3>
+      <input type="text" id="loginUser" placeholder="Login"><br><br>
+      <input type="password" id="loginPass" placeholder="Parol"><br><br>
+      <button onclick="checkLogin()">Kirish</button>
+      <p id="loginError" style="color:red;"></p>
+    </div>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="admin" class="hidden">
+    <h3>Admin panel</h3>
+    <p>O‘quvchilarni belgilang:</p>
+    <table>
+      <tr>
+        <td>Ali</td>
+        <td>
+          <button class="yes" onclick="mark(1,'Keldi')">Keldi</button>
+          <button class="no" onclick="mark(1,'Kelmadi')">Kelmadi</button>
+        </td>
+      </tr>
+      <tr>
+        <td>Vali</td>
+        <td>
+          <button class="yes" onclick="mark(2,'Keldi')">Keldi</button>
+          <button class="no" onclick="mark(2,'Kelmadi')">Kelmadi</button>
+        </td>
+      </tr>
+      <tr>
+        <td>Guli</td>
+        <td>
+          <button class="yes" onclick="mark(3,'Keldi')">Keldi</button>
+          <button class="no" onclick="mark(3,'Kelmadi')">Kelmadi</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  // menyu tugmasi
+  document.querySelector(".menu-btn").onclick = function() {
+    document.getElementById("menu").style.display =
+      document.getElementById("menu").style.display === "block" ? "none" : "block";
+  };
+
+  function showSection(id) {
+    document.getElementById("main").classList.add("hidden");
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("admin").classList.add("hidden");
+    document.getElementById(id).classList.remove("hidden");
+    document.getElementById("menu").style.display = "none";
+  }
+
+  // login tekshirish
+  function checkLogin() {
+    let user = document.getElementById("loginUser").value;
+    let pass = document.getElementById("loginPass").value;
+    if (user === "Faravon_maktab" && pass === "maktab123F") {
+      showSection("admin");
+    } else {
+      document.getElementById("loginError").innerText = "Login yoki parol noto‘g‘ri!";
     }
-    loadStudents();
-  </script>
+  }
+
+  // holat belgilash
+  function mark(id, status) {
+    document.getElementById("status"+id).innerText = status;
+  }
+</script>
+
 </body>
 </html>

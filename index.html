@@ -2,41 +2,106 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
-  <title>Faravonlik Maktabi - O‘quvchilar</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maktab Kundaligi</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: darkblue; }
+    .container { display: flex; gap: 40px; }
+    .panel { border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+    label { display: block; margin-top: 10px; }
+    input { padding: 5px; width: 200px; }
+    button { margin-top: 10px; padding: 6px 12px; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 6px; border-bottom: 1px solid #eee; }
+  </style>
 </head>
 <body>
-  <h1>📘 Faravonlik Maktabi - O‘quvchilar ro‘yxati</h1>
-  <table id="studentsTable">
-    <thead>
-      <tr>
-        <th>Ism</th>
-        <th>Baho</th>
-        <th>Davomat</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <h1>📘 Maktab Kundaligi</h1>
 
+  <div class="container">
+    <!-- Asosiy sahifa (O‘quvchilar ro‘yxati) -->
+    <div class="panel" style="flex:1">
+      <h2>O‘quvchilar ro‘yxati</h2>
+      <ul id="studentList"></ul>
+      <button onclick="getStudents()">🔄 Yangilash</button>
+    </div>
+
+    <!-- Admin panel -->
+    <div class="panel" style="flex:1">
+      <h2>Admin panel</h2>
+      <label>Ismi:</label>
+      <input type="text" id="name">
+      <label>Bahosi:</label>
+      <input type="text" id="grade">
+      <label>Davomati:</label>
+      <input type="text" id="attendance">
+      <button onclick="addStudent()">➕ Qo‘shish</button>
+    </div>
+  </div>
+
+  <!-- Firebase -->
   <script type="module">
-    import { getStudents } from "./firebase.js";
+    // Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-    async function loadStudents() {
-      const students = await getStudents();
-      const tbody = document.querySelector("#studentsTable tbody");
-      tbody.innerHTML = "";
-      students.forEach(s => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${s.name}</td>
-            <td>${s.grade}</td>
-            <td>${s.attendance}</td>
-          </tr>
-        `;
+    // Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBjuHO-fhw6naOd6GdaC5M3UX4AaZTHDE",
+      authDomain: "faravonlik-maktabi.firebaseapp.com",
+      projectId: "faravonlik-maktabi",
+      storageBucket: "faravonlik-maktabi.firebasestorage.app",
+      messagingSenderId: "214290423507",
+      appId: "1:214290423507:web:8970831cf3142085d8fe26",
+      measurementId: "G-YJME3FY39J"
+    };
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // O‘quvchi qo‘shish
+    async function addStudent() {
+      const name = document.getElementById("name").value;
+      const grade = document.getElementById("grade").value;
+      const attendance = document.getElementById("attendance").value;
+
+      if (!name) {
+        alert("Ismni kiriting!");
+        return;
+      }
+
+      await addDoc(collection(db, "students"), {
+        name, grade, attendance
+      });
+
+      alert("✅ O‘quvchi qo‘shildi!");
+      document.getElementById("name").value = "";
+      document.getElementById("grade").value = "";
+      document.getElementById("attendance").value = "";
+
+      getStudents(); // ro‘yxatni yangilash
+    }
+
+    // Ro‘yxatni olish
+    async function getStudents() {
+      const list = document.getElementById("studentList");
+      list.innerHTML = "";
+
+      const querySnapshot = await getDocs(collection(db, "students"));
+      querySnapshot.forEach((doc) => {
+        const s = doc.data();
+        const li = document.createElement("li");
+        li.textContent = `${s.name} | Baho: ${s.grade} | Davomat: ${s.attendance}`;
+        list.appendChild(li);
       });
     }
 
-    loadStudents();
+    // Sahifa ochilganda yuklash
+    getStudents();
+    window.addStudent = addStudent;
+    window.getStudents = getStudents;
   </script>
 </body>
 </html>

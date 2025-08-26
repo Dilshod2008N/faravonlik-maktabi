@@ -1,85 +1,50 @@
+<!-- admin.html (Admin panel) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
-  <title>Faravonlik Maktabi - Admin Panel</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Admin Panel</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBjuHO-fhw6naOd6GdaC5M3UX4AaZTHDE",
+      authDomain: "faravonlik-maktabi.firebaseapp.com",
+      projectId: "faravonlik-maktabi",
+      storageBucket: "faravonlik-maktabi.appspot.com",
+      messagingSenderId: "214290423507",
+      appId: "1:214290423507:web:8970831cf3142085d8fe26",
+      measurementId: "G-YJME3FY39J"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function qoshish() {
+      let ism = document.getElementById("ism").value;
+      let baho = document.getElementById("baho").value;
+      let davomat = document.getElementById("davomat").value;
+
+      await addDoc(collection(db, "oquvchilar"), {
+        ism: ism,
+        baho: baho,
+        davomat: davomat
+      });
+
+      alert("✅ O‘quvchi qo‘shildi!");
+    }
+
+    window.qoshish = qoshish;
+  </script>
 </head>
 <body>
-  <h1>🔑 Admin Panel</h1>
-
-  <h2>O‘quvchi qo‘shish</h2>
-  <form id="addForm">
-    <input type="text" id="name" placeholder="Ism Familiya" required>
-    <input type="number" id="grade" placeholder="Baho" required>
-    <select id="attendance">
-      <option value="Bor">Bor</option>
-      <option value="Yo‘q">Yo‘q</option>
-    </select>
-    <button type="submit">➕ Qo‘shish</button>
-  </form>
-
-  <h2>O‘quvchilar ro‘yxati</h2>
-  <table id="studentsTable">
-    <thead>
-      <tr>
-        <th>Ism</th>
-        <th>Baho</th>
-        <th>Davomat</th>
-        <th>Amallar</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script type="module">
-    import { getStudents, addStudent, updateStudent, deleteStudent } from "./firebase.js";
-
-    // 🔹 O‘quvchi qo‘shish
-    document.getElementById("addForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const grade = document.getElementById("grade").value;
-      const attendance = document.getElementById("attendance").value;
-
-      await addStudent(name, grade, attendance);
-      loadStudents();
-      e.target.reset();
-    });
-
-    // 🔹 Ro‘yxatni yuklash
-    async function loadStudents() {
-      const students = await getStudents();
-      const tbody = document.querySelector("#studentsTable tbody");
-      tbody.innerHTML = "";
-      students.forEach(s => {
-        tbody.innerHTML += `
-          <tr>
-            <td><input type="text" value="${s.name}" onchange="update('${s.id}', 'name', this.value)"></td>
-            <td><input type="number" value="${s.grade}" onchange="update('${s.id}', 'grade', this.value)"></td>
-            <td>
-              <select onchange="update('${s.id}', 'attendance', this.value)">
-                <option value="Bor" ${s.attendance === "Bor" ? "selected" : ""}>Bor</option>
-                <option value="Yo‘q" ${s.attendance === "Yo‘q" ? "selected" : ""}>Yo‘q</option>
-              </select>
-            </td>
-            <td><button onclick="del('${s.id}')">❌ O‘chirish</button></td>
-          </tr>
-        `;
-      });
-    }
-
-    // 🔹 Yangilash va o‘chirish
-    window.update = async (id, field, value) => {
-      await updateStudent(id, { [field]: value });
-    }
-
-    window.del = async (id) => {
-      await deleteStudent(id);
-      loadStudents();
-    }
-
-    loadStudents();
-  </script>
+  <h1>⚙️ Admin Panel</h1>
+  <input id="ism" placeholder="Ism">
+  <input id="baho" placeholder="Baho">
+  <input id="davomat" placeholder="Davomat">
+  <button onclick="qoshish()">Qo‘shish</button>
+  <br><br>
+  <a href="index.html">Asosiy sahifaga qaytish</a>
 </body>
 </html>

@@ -2,57 +2,82 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Panel</title>
+  <title>Faravonlik Maktabi - Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>👨‍🏫 Admin Panel</h1>
-  <input type="text" id="ism" placeholder="Ism"><br>
-  <input type="text" id="sinfi" placeholder="Sinf"><br>
-  <button id="addBtn">➕ O‘quvchi qo‘shish</button>
+  <h1>🔑 Admin Panel</h1>
+
+  <h2>O‘quvchi qo‘shish</h2>
+  <form id="addForm">
+    <input type="text" id="name" placeholder="Ism Familiya" required>
+    <input type="number" id="grade" placeholder="Baho" required>
+    <select id="attendance">
+      <option value="Bor">Bor</option>
+      <option value="Yo‘q">Yo‘q</option>
+    </select>
+    <button type="submit">➕ Qo‘shish</button>
+  </form>
 
   <h2>O‘quvchilar ro‘yxati</h2>
-  <ul id="studentsList"></ul>
+  <table id="studentsTable">
+    <thead>
+      <tr>
+        <th>Ism</th>
+        <th>Baho</th>
+        <th>Davomat</th>
+        <th>Amallar</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-  <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+    import { getStudents, addStudent, updateStudent, deleteStudent } from "./firebase.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCBjuHO-fhw6naOd6GdaC5M3UX4AaZTHDE",
-      authDomain: "faravonlik-maktabi.firebaseapp.com",
-      projectId: "faravonlik-maktabi",
-      storageBucket: "faravonlik-maktabi.firebasestorage.app",
-      messagingSenderId: "214290423507",
-      appId: "1:214290423507:web:8970831cf3142085d8fe26",
-      measurementId: "G-YJME3FY39J"
-    };
+    // 🔹 O‘quvchi qo‘shish
+    document.getElementById("addForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const grade = document.getElementById("grade").value;
+      const attendance = document.getElementById("attendance").value;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+      await addStudent(name, grade, attendance);
+      loadStudents();
+      e.target.reset();
+    });
 
+    // 🔹 Ro‘yxatni yuklash
     async function loadStudents() {
-      const list = document.getElementById("studentsList");
-      list.innerHTML = "";
-      const querySnapshot = await getDocs(collection(db, "oquvchilar"));
-      querySnapshot.forEach((doc) => {
-        let li = document.createElement("li");
-        li.textContent = doc.data().ism + " - " + doc.data().sinfi;
-        list.appendChild(li);
+      const students = await getStudents();
+      const tbody = document.querySelector("#studentsTable tbody");
+      tbody.innerHTML = "";
+      students.forEach(s => {
+        tbody.innerHTML += `
+          <tr>
+            <td><input type="text" value="${s.name}" onchange="update('${s.id}', 'name', this.value)"></td>
+            <td><input type="number" value="${s.grade}" onchange="update('${s.id}', 'grade', this.value)"></td>
+            <td>
+              <select onchange="update('${s.id}', 'attendance', this.value)">
+                <option value="Bor" ${s.attendance === "Bor" ? "selected" : ""}>Bor</option>
+                <option value="Yo‘q" ${s.attendance === "Yo‘q" ? "selected" : ""}>Yo‘q</option>
+              </select>
+            </td>
+            <td><button onclick="del('${s.id}')">❌ O‘chirish</button></td>
+          </tr>
+        `;
       });
     }
 
-    document.getElementById("addBtn").addEventListener("click", async () => {
-      let ism = document.getElementById("ism").value;
-      let sinfi = document.getElementById("sinfi").value;
-      if (ism && sinfi) {
-        await addDoc(collection(db, "oquvchilar"), { ism: ism, sinfi: sinfi });
-        alert("✅ O‘quvchi qo‘shildi!");
-        loadStudents();
-      } else {
-        alert("❌ Ism va sinfni kiriting!");
-      }
-    });
+    // 🔹 Yangilash va o‘chirish
+    window.update = async (id, field, value) => {
+      await updateStudent(id, { [field]: value });
+    }
+
+    window.del = async (id) => {
+      await deleteStudent(id);
+      loadStudents();
+    }
 
     loadStudents();
   </script>

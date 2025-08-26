@@ -2,39 +2,37 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
-  <title>Faravonlik Maktabi</title>
+  <title>Faravonlik Maktabi - O‘quvchilar</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>📖 O‘quvchilar ro‘yxati</h1>
-  <ul id="studentsList"></ul>
+  <h1>📘 Faravonlik Maktabi - O‘quvchilar ro‘yxati</h1>
+  <table id="studentsTable">
+    <thead>
+      <tr>
+        <th>Ism</th>
+        <th>Baho</th>
+        <th>Davomat</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-  <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-
-    // Config sizniki 👇
-    const firebaseConfig = {
-      apiKey: "AIzaSyCBjuHO-fhw6naOd6GdaC5M3UX4AaZTHDE",
-      authDomain: "faravonlik-maktabi.firebaseapp.com",
-      projectId: "faravonlik-maktabi",
-      storageBucket: "faravonlik-maktabi.firebasestorage.app",
-      messagingSenderId: "214290423507",
-      appId: "1:214290423507:web:8970831cf3142085d8fe26",
-      measurementId: "G-YJME3FY39J"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    import { getStudents } from "./firebase.js";
 
     async function loadStudents() {
-      const list = document.getElementById("studentsList");
-      list.innerHTML = "";
-      const querySnapshot = await getDocs(collection(db, "oquvchilar"));
-      querySnapshot.forEach((doc) => {
-        let li = document.createElement("li");
-        li.textContent = doc.data().ism + " - " + doc.data().sinfi;
-        list.appendChild(li);
+      const students = await getStudents();
+      const tbody = document.querySelector("#studentsTable tbody");
+      tbody.innerHTML = "";
+      students.forEach(s => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${s.name}</td>
+            <td>${s.grade}</td>
+            <td>${s.attendance}</td>
+          </tr>
+        `;
       });
     }
 

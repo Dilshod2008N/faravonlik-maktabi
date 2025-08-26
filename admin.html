@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+</head>
+<body>
+  <h1>👨‍🏫 Admin Panel</h1>
+  <input type="text" id="ism" placeholder="Ism"><br>
+  <input type="text" id="sinfi" placeholder="Sinf"><br>
+  <button id="addBtn">➕ O‘quvchi qo‘shish</button>
+
+  <h2>O‘quvchilar ro‘yxati</h2>
+  <ul id="studentsList"></ul>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBjuHO-fhw6naOd6GdaC5M3UX4AaZTHDE",
+      authDomain: "faravonlik-maktabi.firebaseapp.com",
+      projectId: "faravonlik-maktabi",
+      storageBucket: "faravonlik-maktabi.firebasestorage.app",
+      messagingSenderId: "214290423507",
+      appId: "1:214290423507:web:8970831cf3142085d8fe26",
+      measurementId: "G-YJME3FY39J"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadStudents() {
+      const list = document.getElementById("studentsList");
+      list.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "oquvchilar"));
+      querySnapshot.forEach((doc) => {
+        let li = document.createElement("li");
+        li.textContent = doc.data().ism + " - " + doc.data().sinfi;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById("addBtn").addEventListener("click", async () => {
+      let ism = document.getElementById("ism").value;
+      let sinfi = document.getElementById("sinfi").value;
+      if (ism && sinfi) {
+        await addDoc(collection(db, "oquvchilar"), { ism: ism, sinfi: sinfi });
+        alert("✅ O‘quvchi qo‘shildi!");
+        loadStudents();
+      } else {
+        alert("❌ Ism va sinfni kiriting!");
+      }
+    });
+
+    loadStudents();
+  </script>
+</body>
+</html>
